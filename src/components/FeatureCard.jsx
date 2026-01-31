@@ -8,4 +8,8 @@ export default function FeatureCard({ icon, title, description }) {
       <p className="text-sm text-gray-600">{description}</p>
     </div>
   );
+
+ 
+
 }
+

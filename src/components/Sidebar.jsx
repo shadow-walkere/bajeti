@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { NavLink } from "react-router-dom";
 import {
   Home,
   LayoutDashboard,
@@ -5,41 +7,106 @@ import {
   MapPin,
   Bell,
   AlertCircle,
-  Settings
+  Settings,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 export default function Sidebar() {
+  const [collapsed, setCollapsed] = useState(false);
+
   return (
-    <aside className="w-64 bg-black text-white h-screen fixed">
-      <div className="p-6 border-b border-gray-800">
-        <h1 className="text-xl font-bold">Bajeti</h1>
-        <p className="text-sm text-gray-400">Transparency Portal</p>
+    <aside
+      className={`bg-black text-white h-screen fixed transition-all duration-300
+      ${collapsed ? "w-20" : "w-64"}`}
+    >
+      {/* Logo + Toggle */}
+      <div className="p-6 border-b border-gray-800 flex justify-between items-center">
+        {!collapsed && (
+          <div>
+            <h1 className="text-xl font-bold">Bajeti</h1>
+            <p className="text-sm text-gray-400">Transparency Portal</p>
+          </div>
+        )}
+
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="text-gray-400 hover:text-white"
+        >
+          {collapsed ? <ChevronRight /> : <ChevronLeft />}
+        </button>
       </div>
 
-      <nav className="mt-6 space-y-1 px-4">
-        <NavItem icon={<Home size={18} />} label="Home" active />
-        <NavItem icon={<LayoutDashboard size={18} />} label="My Dashboard" />
-        <NavItem icon={<BarChart3 size={18} />} label="National Budget" />
-        <NavItem icon={<MapPin size={18} />} label="County Budget" />
-        <NavItem icon={<Bell size={18} />} label="Alert Center" />
-        <NavItem icon={<AlertCircle size={18} />} label="Report Issue" />
+      {/* Navigation */}
+      <nav className="mt-6 space-y-1 px-3 relative h-full">
+        <NavItem to="/" icon={<Home size={20} />} label="Home" collapsed={collapsed} />
+        <NavItem
+          to="/dashboard"
+          icon={<LayoutDashboard size={20} />}
+          label="My Dashboard"
+          collapsed={collapsed}
+        />
+        <NavItem
+          to="/national-budget"
+          icon={<BarChart3 size={20} />}
+          label="National Budget"
+          collapsed={collapsed}
+        />
+        <NavItem
+          to="/county-budget"
+          icon={<MapPin size={20} />}
+          label="County Budget"
+          collapsed={collapsed}
+        />
+        <NavItem
+          to="/project-tracker"
+          icon={<MapPin size={20} />}
+          label="Project Tracker"
+          collapsed={collapsed}
+        />
+        <NavItem
+          to="/alerts"
+          icon={<Bell size={20} />}
+          label="Alert Center"
+          collapsed={collapsed}
+        />
+        <NavItem
+          to="/report"
+          icon={<AlertCircle size={20} />}
+          label="Report Issue"
+          collapsed={collapsed}
+        />
+
+        {/* Bottom */}
+        <div className="absolute bottom-4 left-3 right-3">
+          <NavItem
+            to="/settings"
+            icon={<Settings size={20} />}
+            label="Settings"
+            collapsed={collapsed}
+          />
+        </div>
       </nav>
-
-      <div className="absolute bottom-4 left-4 right-4">
-        <NavItem icon={<Settings size={18} />} label="Settings" />
-      </div>
     </aside>
   );
 }
 
-function NavItem({ icon, label, active }) {
+/* Nav Item */
+function NavItem({ icon, label, to, collapsed }) {
   return (
-    <div
-      className={`flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer
-      ${active ? "bg-green-600" : "hover:bg-gray-800"}`}
+    <NavLink
+      to={to}
+      className={({ isActive }) =>
+        `flex items-center gap-3 px-4 py-3 rounded-lg transition
+        ${
+          isActive
+            ? "bg-green-600 text-white"
+            : "text-gray-400 hover:bg-gray-800 hover:text-white"
+        }`
+      }
     >
       {icon}
-      <span>{label}</span>
-    </div>
+      {!collapsed && <span className="text-sm font-medium">{label}</span>}
+    </NavLink>
   );
 }
