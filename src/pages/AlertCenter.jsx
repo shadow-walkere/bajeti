@@ -2,20 +2,15 @@ import React, { useState } from 'react';
 import { 
   Bell, 
   Search, 
-  Filter, 
   Settings, 
-  LayoutDashboard, 
-  Map, 
-  Briefcase, 
   AlertTriangle, 
   CheckCircle, 
   Info, 
-  XCircle,
   MoreHorizontal,
   ChevronDown
 } from 'lucide-react';
 
-// --- Mock Data matching the screenshot ---
+// --- Mock Data ---
 const stats = [
   { label: 'Critical', count: 2, type: 'critical' },
   { label: 'Warning', count: 2, type: 'warning' },
@@ -100,12 +95,6 @@ const alertsData = [
 
 // --- Helper Components ---
 
-const SidebarItem = ({ icon: Icon, active = false }) => (
-  <div className={`p-3 rounded-xl mb-4 cursor-pointer transition-colors ${active ? 'bg-green-600 text-white' : 'text-gray-400 hover:bg-gray-800'}`}>
-    <Icon size={24} />
-  </div>
-);
-
 const StatCard = ({ label, count, type }) => {
   const styles = {
     critical: 'bg-red-50 text-red-600 border-red-100',
@@ -122,7 +111,7 @@ const StatCard = ({ label, count, type }) => {
   };
 
   return (
-    <div className={`flex items-center p-4 rounded-lg border ${styles[type]} shadow-sm`}>
+    <div className={`flex items-center p-4 rounded-lg border ${styles[type]} shadow-sm bg-white`}>
       <div className="mr-3">{icons[type]}</div>
       <div>
         <div className="text-2xl font-bold">{count}</div>
@@ -185,122 +174,102 @@ export default function AlertCenter() {
   const [activeTab, setActiveTab] = useState('All');
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
-      
-      {/* Sidebar */}
-      <aside className="w-20 bg-gray-900 flex flex-col items-center py-6 flex-shrink-0">
-        <div className="mb-8">
-          <div className="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center text-white font-bold text-xl">
-            L
+    <div className="font-sans min-h-screen">
+      <div className="max-w-7xl mx-auto p-4 md:p-8">
+        
+        {/* Header */}
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Alert Center</h1>
+            <p className="text-gray-500 text-sm mt-1">Real-time budget alerts and anomaly notifications</p>
           </div>
-        </div>
-        <nav className="flex-1 w-full flex flex-col items-center">
-          <SidebarItem icon={LayoutDashboard} />
-          <SidebarItem icon={Briefcase} />
-          <SidebarItem icon={Map} />
-          <SidebarItem icon={Bell} active />
-          <SidebarItem icon={Settings} />
-        </nav>
-      </aside>
+          <div className="flex gap-3 w-full md:w-auto">
+            <button className="flex-1 md:flex-none justify-center flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 bg-white">
+              <Settings size={16} />
+              Preferences
+            </button>
+            <button className="flex-1 md:flex-none justify-center flex items-center gap-2 px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 shadow-sm">
+              <Bell size={16} />
+              Subscribe
+            </button>
+          </div>
+        </header>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-y-auto">
-        <div className="max-w-7xl mx-auto p-8">
-          
-          {/* Header */}
-          <header className="flex justify-between items-start mb-8">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Alert Center</h1>
-              <p className="text-gray-500 text-sm mt-1">Real-time budget alerts and anomaly notifications</p>
-            </div>
-            <div className="flex gap-3">
-              <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 bg-white">
-                <Settings size={16} />
-                Preferences
-              </button>
-              <button className="flex items-center gap-2 px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 shadow-sm">
-                <Bell size={16} />
-                Subscribe
-              </button>
-            </div>
-          </header>
+        {/* Stats Grid */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          {stats.map((stat) => (
+            <StatCard key={stat.label} {...stat} />
+          ))}
+        </section>
 
-          {/* Stats Grid */}
-          <section className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            {stats.map((stat) => (
-              <StatCard key={stat.label} {...stat} />
+        {/* Filters Bar */}
+        <section className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+          <div className="relative w-full md:w-96">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+            <input 
+              type="text" 
+              placeholder="Search alerts..." 
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm"
+            />
+          </div>
+
+          <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-hide">
+            {['All', 'Critical', 'Warning', 'Info', 'Success'].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-4 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
+                  activeTab === tab 
+                    ? 'bg-green-800 text-white' 
+                    : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                {tab}
+              </button>
             ))}
-          </section>
-
-          {/* Filters Bar */}
-          <section className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
-            <div className="relative w-full md:w-96">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-              <input 
-                type="text" 
-                placeholder="Search alerts..." 
-                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm"
-              />
-            </div>
-
-            <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0">
-              {['All', 'Critical', 'Warning', 'Info', 'Success'].map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`px-4 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                    activeTab === tab 
-                      ? 'bg-green-800 text-white' 
-                      : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
-                  }`}
-                >
-                  {tab}
-                </button>
-              ))}
-              <div className="h-6 w-px bg-gray-300 mx-2"></div>
-              <button className="flex items-center gap-1 px-3 py-1.5 bg-white border border-gray-200 rounded-md text-xs font-medium text-gray-600 hover:bg-gray-50">
-                All Sectors <ChevronDown size={14} />
-              </button>
-            </div>
-          </section>
-
-          {/* Alerts List */}
-          <div className="mb-4">
-            <div className="text-xs text-gray-500 mb-3 font-medium">Showing {alertsData.length} alerts</div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {alertsData.map((alert) => (
-                <AlertCard key={alert.id} alert={alert} />
-              ))}
-            </div>
+            <div className="h-6 w-px bg-gray-300 mx-2 hidden md:block"></div>
+            <button className="hidden md:flex items-center gap-1 px-3 py-1.5 bg-white border border-gray-200 rounded-md text-xs font-medium text-gray-600 hover:bg-gray-50">
+              All Sectors <ChevronDown size={14} />
+            </button>
           </div>
+        </section>
 
-          <div className="flex justify-end mb-8">
-             <button className="text-xs flex items-center gap-1 text-gray-500 hover:text-gray-700">
-                <MoreHorizontal size={14} /> More Recent
-             </button>
+        {/* Alerts List */}
+        <div className="mb-4">
+          <div className="text-xs text-gray-500 mb-3 font-medium">Showing {alertsData.length} alerts</div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {alertsData.map((alert) => (
+              <AlertCard key={alert.id} alert={alert} />
+            ))}
           </div>
-
-          {/* Bottom CTA */}
-          <section className="bg-green-50 border border-green-100 rounded-xl p-8 text-center mt-8">
-            <div className="flex justify-center mb-4">
-              <Bell className="text-green-700" size={32} />
-            </div>
-            <h2 className="text-lg font-bold text-gray-900 mb-2">Never Miss an Alert</h2>
-            <p className="text-gray-600 text-sm mb-6 max-w-lg mx-auto">
-              Subscribe to receive personalized alerts about budget issues in your county, sector, or projects you're following.
-            </p>
-            <div className="flex justify-center gap-4">
-              <button className="px-6 py-2.5 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 shadow-sm flex items-center gap-2">
-                <Bell size={16} /> Subscribe to Alerts
-              </button>
-              <button className="px-6 py-2.5 bg-transparent border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-white flex items-center gap-2">
-                Customize Preferences <span className="text-xs">→</span>
-              </button>
-            </div>
-          </section>
-
         </div>
-      </main>
+
+        <div className="flex justify-end mb-8">
+           <button className="text-xs flex items-center gap-1 text-gray-500 hover:text-gray-700">
+              <MoreHorizontal size={14} /> More Recent
+           </button>
+        </div>
+
+        {/* Bottom CTA */}
+        <section className="bg-green-50 border border-green-100 rounded-xl p-6 md:p-8 text-center mt-8">
+          <div className="flex justify-center mb-4">
+            <Bell className="text-green-700" size={32} />
+          </div>
+          <h2 className="text-lg font-bold text-gray-900 mb-2">Never Miss an Alert</h2>
+          <p className="text-gray-600 text-sm mb-6 max-w-lg mx-auto">
+            Subscribe to receive personalized alerts about budget issues in your county, sector, or projects you're following.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <button className="px-6 py-2.5 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 shadow-sm flex items-center justify-center gap-2">
+              <Bell size={16} /> Subscribe to Alerts
+            </button>
+            <button className="px-6 py-2.5 bg-transparent border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-white flex items-center justify-center gap-2">
+              Customize Preferences <span className="text-xs">→</span>
+            </button>
+          </div>
+        </section>
+
+      </div>
     </div>
   );
 }
